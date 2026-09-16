@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zion AI Vendor Lock-in Risk Score</title>
+<meta name="description" content="How portable is your AI stack? Assess vendor lock-in risk across models, data, tooling and skills. Free tool by Zion Tech Group.">
+<style>
+:root{--bg:#100d0a;--card:#1c1610;--acc:#fbbf24;--txt:#f7efe3;--mut:#bfa88f}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt)}
+header{padding:48px 24px 24px;text-align:center;background:linear-gradient(160deg,#3a2708,#100d0a)}
+h1{margin:0 0 8px}.wrap{max-width:860px;margin:0 auto;padding:24px}
+.q{background:var(--card);border:1px solid #332717;border-radius:12px;padding:16px;margin:10px 0}
+.q b{display:block;margin-bottom:10px}
+.q label{display:block;margin:6px 0;font-size:.95rem;cursor:pointer}
+.score{position:sticky;bottom:16px;background:#241a08;border:1px solid #4d3a12;border-radius:14px;padding:16px;text-align:center;font-size:1.2rem;margin-top:24px}
+.bar{height:10px;background:#1a1308;border-radius:6px;margin-top:8px;overflow:hidden}.bar>div{height:100%;background:var(--acc);width:0;transition:width .3s}
+button{margin-top:14px;padding:12px 22px;border:0;border-radius:10px;background:var(--acc);color:#241804;font-weight:700;cursor:pointer}
+footer{padding:32px 24px;text-align:center;color:var(--mut);font-size:.85rem;border-top:1px solid #2a2013;margin-top:40px}
+footer a{color:var(--acc);text-decoration:none;margin:0 8px}
+</style>
+</head>
+<body>
+<header><h1>🔗 Zion AI Vendor Lock-in Risk Score</h1>
+<p>Answer 8 questions about your AI stack. Higher score = higher switching cost. Get mitigation tips.</p></header>
+<div class="wrap" id="app"></div>
+<footer>Part of the <a href="https://ziontechgroup.com">Zion Tech Group</a> AI apps network ·
+<a href="https://ziontechgroup.com/zion-model-router/">Model Router</a>
+<a href="https://ziontechgroup.com/zion-data-readiness-audit/">Data Readiness</a>
+<a href="https://ziontechgroup.com/ai-integration-services/">Zion integration services</a></footer>
+<script>
+const Q=[
+['Model access',['Single vendor, proprietary API','Vendor-agnostic gateway (OpenAI-compatible)','Self-hosted open models'],[2,1,0]],
+['Prompts & outputs',['Locked in vendor tooling','Stored in our own repo, portable format','Versioned as code with evals'],[2,1,0]],
+['Vector / data layer',['Proprietary managed-only store','Portable OSS engine (pgvector, Qdrant, Milvus)','Standard formats + export pipelines'],[2,1,0]],
+['Agent tooling',['Vendor-specific agent runtime','Framework (LangGraph etc.) with abstraction','MCP-standard tools, swappable servers'],[2,1,0]],
+['Fine-tunes',['Fine-tuned on proprietary model only','Fine-tunes on open models we can host','Adapters (LoRA) we own + base weights portable'],[2,1,0]],
+['Evals & telemetry',['Vendor console only','Third-party observability','OpenTelemetry + our own eval harness'],[2,1,0]],
+['Data gravity',['Training data lives only in vendor cloud','Hybrid with export paths','Our own lake/warehouse, vendors are stateless'],[2,1,0]],
+['Contract & skills',['Multi-year contract, vendor-only skills on team','Annual contract, mixed skills','Monthly terms, team fluent in open stack'],[2,1,0]]];
+const app=document.getElementById('app');
+app.innerHTML=Q.map(([q,opts],i)=>`<div class="q"><b>${i+1}. ${q}</b>${opts.map((o,j)=>`<label><input type="radio" name="q${i}" value="${Q[i][2][j]}"> ${o}</label>`).join('')}</div>`).join('')+'<button onclick="score()">Calculate risk score</button><div class="score" id="s" style="display:none"><div>Lock-in risk: <b id="pct"></b> <span id="v" style="color:var(--mut);font-size:.9rem"></span></div><div class="bar"><div id="fill"></div></div><div id="tips" style="text-align:left;font-size:.85rem;color:var(--mut);margin-top:10px"></div></div>';
+function score(){let sum=0,ans=0;Q.forEach((_,i)=>{const r=document.querySelector(`input[name=q${i}]:checked`);if(r){sum+=+r.value;ans++;}});
+if(ans<Q.length){alert('Answer all 8 questions.');return;}
+const p=Math.round(sum/16*100);
+document.getElementById('s').style.display='block';document.getElementById('pct').textContent=p+'/100';document.getElementById('fill').style.width=p+'%';
+document.getElementById('v').textContent=p>=70?'— high lock-in, plan exits':p>=40?'— moderate, add abstractions':'— portable stack 👍';
+document.getElementById('tips').innerHTML='<b>Mitigations:</b><br>• Adopt an OpenAI-compatible gateway layer (see our Model Router)<br>• Keep prompts/evals as versioned code<br>• Prefer MCP-standard tool integrations<br>• Own your vector store or keep export pipelines warm<br>• Contract for data portability and deletion rights';}
+</script>
+</body>
+</html>
